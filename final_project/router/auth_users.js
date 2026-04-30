@@ -4,11 +4,11 @@ let books = require("./booksdb.js");
 const regd_users = express.Router();
 
 let users = [
-  { username: "alice", password: "p@ss1" },
-  { username: "bob", password: "p@ss2" },
-  { username: "carol", password: "p@ss3" },
-  { username: "dave", password: "p@ss4" },
-  { username: "eve", password: "p@ss5" }
+  { username: "alice", password: "p@ss" },
+  { username: "bob", password: "p@ss" },
+  { username: "carol", password: "p@ss" },
+  { username: "dave", password: "p@ss" },
+  { username: "eve", password: "p@ss" }
 ];
 
 // let users = []
@@ -54,9 +54,46 @@ regd_users.post("/login", (req,res) => {
 
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  //Write your code hereA
+  const isbn = req.params.isbn
+  const review = req.body.review
+  const user = req.session.authorization?.username
+
+  if(!user){
+    return res.status(404).json({message: `User is not logged in`})
+  }
+
+  if(!books[isbn]){
+    return res.status(404).json({message: `Error: book with ISBN #${isbn} was not found`})
+  }
+
+  if(!review){
+    return res.status(404).json({message: `Error: No review provided`})
+  }
+
+  books[isbn].reviews[user] = review
+  return res.status(200).json(books[isbn].reviews);
 });
+
+regd_users.delete("/auth/review/:isbn", (req,res) =>{
+  const isbn = req.params.isbn
+  const user = req.session.authorization?.username
+
+  if(!user){
+    return res.status(404).json({message: `User is not logged in`})
+  }
+
+  if(!books[isbn]){
+    return res.status(404).json({message: `Error: book with ISBN #${isbn} was not found`})
+  }
+
+  if(!books[isbn].reviews[user]){
+    return res.status(404).json({message: `Error: Review for ISBN #${isbn} by ${user} not found`})
+  }
+  delete books[isbn].reviews[user]
+
+  return res.status(200).json(books[isbn].reviews);
+})
 
 module.exports.authenticated = regd_users;
 module.exports.isValid = isValid;

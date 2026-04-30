@@ -21,11 +21,6 @@ public_users.post("/register", (req,res) => {
   
 });
 
-//remove (getallusers)
-public_users.get("/test", (req,res) =>{
-  return res.status(200).json(users)
-})
-
 // Get the book list available in the shop
 public_users.get('/',function (req, res) {
   return res.status(200).json(books);
