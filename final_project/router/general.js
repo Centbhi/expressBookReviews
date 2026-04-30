@@ -4,12 +4,27 @@ let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
 
-
 public_users.post("/register", (req,res) => {
-  //Write your code here
+  const username = req.body.username
+  const password = req.body.password
+
+  if(!username || !password){
+    return res.status(400).json({message: `Error: Username or Password not provided`})
+  }
+
+  if(isValid(username)){
+    users.push({username: username, password: password})
+    return res.status(200).json({message: `User "${username}" successfully registered`})
+  }
+
+  return res.status(409).json({message: `Error: username "${username}" already exists`})
   
-  return res.status(300).json({message: "Yet to be implemented"});
 });
+
+//remove (getallusers)
+public_users.get("/test", (req,res) =>{
+  return res.status(200).json(users)
+})
 
 // Get the book list available in the shop
 public_users.get('/',function (req, res) {
@@ -40,7 +55,7 @@ public_users.get('/author/:author',function (req, res) {
   if(booksFromAuthor.length > 0){
     return res.status(200).json(booksFromAuthor)
   }else{
-    return res.status(404).json({message: `Error: no book with Author ${author} was found`})
+    return res.status(404).json({message: `Error: no book with Author "${author}" was found`})
   }
 });
 
@@ -58,7 +73,7 @@ public_users.get('/title/:title',function (req, res) {
   if(booksFromTitle.length > 0){
     return res.status(200).json(booksFromTitle)
   }else{
-    return res.status(404).json({message: `Error: no book with Title ${title} was found`})
+    return res.status(404).json({message: `Error: no book with Title "${title}" was found`})
   }
 });
 
